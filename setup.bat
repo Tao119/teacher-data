@@ -72,17 +72,22 @@ if errorlevel 1 (
 cd /d "%ROOT%"
 echo.
 
-echo ffmpeg を確認中...
+echo ffmpeg / ffprobe を確認中...
+set FFMPEG_OK=1
 where ffmpeg >nul 2>&1
-if errorlevel 1 (
+if errorlevel 1 set FFMPEG_OK=0
+where ffprobe >nul 2>&1
+if errorlevel 1 set FFMPEG_OK=0
+
+if "!FFMPEG_OK!"=="0" (
     echo.
-    echo [警告] ffmpeg が見つかりません。音声処理に必要です。
+    echo [警告] ffmpeg または ffprobe が見つかりません。音声処理に必要です。
     echo   winget install ffmpeg  または
     echo   https://ffmpeg.org/download.html からインストールしてください。
-    echo   インストール後、Windowsを再起動してから start.bat を実行してください。
+    echo   インストール後、コマンドプロンプトを再起動してから start.bat を実行してください。
     echo.
 ) else (
-    echo   ffmpeg OK
+    echo   ffmpeg OK / ffprobe OK
 )
 echo.
 
