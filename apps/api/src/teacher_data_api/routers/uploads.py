@@ -48,6 +48,8 @@ async def upload_audio(
             select(AudioFile).where(AudioFile.project_id == project_id, AudioFile.sha256 == sha256)
         )).scalar_one_or_none()
         if existing:
+            existing.status = "pending"
+            existing.error_message = None
             created.append({"id": existing.id, "name": file.filename, "duplicate": True})
             continue
 
