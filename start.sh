@@ -11,7 +11,7 @@ API_PID=$!
 
 echo "Starting Next.js frontend..."
 cd "$ROOT/apps/web"
-npm run dev &
+npm run dev -- --hostname 0.0.0.0 &
 WEB_PID=$!
 
 echo ""
