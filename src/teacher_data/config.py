@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     google_api_key: str = Field(..., alias="GOOGLE_API_KEY")
 
     whisper_model: str = Field("whisper-1", alias="WHISPER_MODEL")
-    gemini_model: str = Field("gemini-2.0-flash", alias="GEMINI_MODEL")
+    gemini_model: str = Field("gemini-2.5-flash", alias="GEMINI_MODEL")
 
     language: str = Field("ja", alias="LANGUAGE")
     concurrency: int = Field(4, alias="CONCURRENCY")

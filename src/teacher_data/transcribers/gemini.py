@@ -19,7 +19,7 @@ TRANSCRIPTION_PROMPT = (
 async def transcribe_gemini(
     path: Path,
     api_key: str,
-    model: str = "gemini-2.0-flash",
+    model: str = "gemini-2.5-flash",
     language: str = "ja",
 ) -> TranscriptResult:
     def _sync_transcribe() -> TranscriptResult:
