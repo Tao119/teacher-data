@@ -172,13 +172,15 @@ export default function ReviewPage() {
                     style={{ color: STRATEGY_COLOR[r.strategy] ?? "var(--text-muted)" }}>{r.strategy}</span>
                   {r.strategy !== "fallback" && (
                     <div className="flex items-center gap-1 flex-1 min-w-0">
-                      <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: "var(--border)" }}>
-                        <div className="h-1 rounded-full" style={{
+                      <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "#e5e7eb" }}>
+                        <div className="h-1.5 rounded-full" style={{
                           width: `${r.similarity * 100}%`,
-                          background: r.similarity >= 0.95 ? "var(--success)" : r.similarity >= 0.80 ? "var(--warning)" : "var(--danger)"
+                          background: r.similarity >= 0.95 ? "#16a34a" : r.similarity >= 0.80 ? "#d97706" : "#dc2626"
                         }} />
                       </div>
-                      <span className="text-xs font-mono shrink-0" style={{ color: "var(--text-muted)" }}>
+                      <span className="text-xs font-mono shrink-0" style={{
+                        color: r.similarity >= 0.95 ? "#16a34a" : r.similarity >= 0.80 ? "#d97706" : "#dc2626"
+                      }}>
                         {Math.round(r.similarity * 100)}%
                       </span>
                     </div>
@@ -259,14 +261,14 @@ export default function ReviewPage() {
                       <span>片方のみ</span>
                     ) : (
                       <div className="flex items-center gap-1.5">
-                        <div className="w-24 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--border)" }}>
+                        <div className="w-24 h-1.5 rounded-full overflow-hidden" style={{ background: "#e5e7eb" }}>
                           <div className="h-1.5 rounded-full transition-all" style={{
                             width: `${selected.similarity * 100}%`,
-                            background: selected.similarity >= 0.95 ? "var(--success)" : selected.similarity >= 0.80 ? "var(--warning)" : "var(--danger)"
+                            background: selected.similarity >= 0.95 ? "#16a34a" : selected.similarity >= 0.80 ? "#d97706" : "#dc2626"
                           }} />
                         </div>
                         <span className="font-mono font-medium" style={{
-                          color: selected.similarity >= 0.95 ? "var(--success)" : selected.similarity >= 0.80 ? "var(--warning)" : "var(--danger)"
+                          color: selected.similarity >= 0.95 ? "#16a34a" : selected.similarity >= 0.80 ? "#d97706" : "#dc2626"
                         }}>
                           {Math.round(selected.similarity * 100)}%
                         </span>
