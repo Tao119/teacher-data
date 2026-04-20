@@ -14,9 +14,9 @@ cd apps/web && npm install && cd ../..
 
 **Windows**
 ```bat
-uv sync
-cd apps\web && npm install && cd ..\..
+setup.bat
 ```
+APIキーを対話入力するだけで `.env` 作成・依存インストールまで完了します。
 
 > `uv` がない場合: https://docs.astral.sh/uv/getting-started/installation/
 
