@@ -170,11 +170,21 @@ export default function ReviewPage() {
                 <div className="flex gap-2 mt-1.5 items-center">
                   <span className="text-xs font-medium"
                     style={{ color: STRATEGY_COLOR[r.strategy] ?? "var(--text-muted)" }}>{r.strategy}</span>
-                  <span className="text-xs font-mono" style={{ color: "var(--text-muted)" }}>
-                    {r.strategy === "fallback" ? "—" : `類似度 ${r.similarity.toFixed(2)}`}
-                  </span>
+                  {r.strategy !== "fallback" && (
+                    <div className="flex items-center gap-1 flex-1 min-w-0">
+                      <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: "var(--border)" }}>
+                        <div className="h-1 rounded-full" style={{
+                          width: `${r.similarity * 100}%`,
+                          background: r.similarity >= 0.95 ? "var(--success)" : r.similarity >= 0.80 ? "var(--warning)" : "var(--danger)"
+                        }} />
+                      </div>
+                      <span className="text-xs font-mono shrink-0" style={{ color: "var(--text-muted)" }}>
+                        {Math.round(r.similarity * 100)}%
+                      </span>
+                    </div>
+                  )}
                   {r.bucket === "train" && (
-                    <span className="text-xs ml-auto" style={{ color: "var(--success)" }}>✓ train</span>
+                    <span className="text-xs ml-auto" style={{ color: "var(--success)" }}>✓</span>
                   )}
                 </div>
               </button>
@@ -241,12 +251,27 @@ export default function ReviewPage() {
                 <div className="px-4 py-2.5 border-b flex items-center justify-between"
                   style={{ borderColor: "var(--border)" }}>
                   <span className="text-xs font-medium" style={{ color: "var(--text-secondary)" }}>採用テキスト</span>
-                  <div className="flex items-center gap-3 text-xs font-mono" style={{ color: "var(--text-muted)" }}>
-                    <span style={{ color: STRATEGY_COLOR[selected.strategy] ?? "var(--text-muted)" }}>
+                  <div className="flex items-center gap-3 text-xs" style={{ color: "var(--text-muted)" }}>
+                    <span className="font-medium" style={{ color: STRATEGY_COLOR[selected.strategy] ?? "var(--text-muted)" }}>
                       {selected.strategy}
                     </span>
-                    <span>{selected.strategy === "fallback" ? "片方のみ" : `類似度 ${selected.similarity.toFixed(3)}`}</span>
-                    <span>conf {selected.confidence.toFixed(3)}</span>
+                    {selected.strategy === "fallback" ? (
+                      <span>片方のみ</span>
+                    ) : (
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-24 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--border)" }}>
+                          <div className="h-1.5 rounded-full transition-all" style={{
+                            width: `${selected.similarity * 100}%`,
+                            background: selected.similarity >= 0.95 ? "var(--success)" : selected.similarity >= 0.80 ? "var(--warning)" : "var(--danger)"
+                          }} />
+                        </div>
+                        <span className="font-mono font-medium" style={{
+                          color: selected.similarity >= 0.95 ? "var(--success)" : selected.similarity >= 0.80 ? "var(--warning)" : "var(--danger)"
+                        }}>
+                          {Math.round(selected.similarity * 100)}%
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="p-3">
