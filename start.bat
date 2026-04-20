@@ -6,9 +6,9 @@ REM 末尾のバックスラッシュを除去
 if "%ROOT:~-1%"=="\" set ROOT=%ROOT:~0,-1%
 
 REM WinGet でインストールした ffmpeg を PATH に追加
-for /d %%D in ("%LOCALAPPDATA%\Microsoft\WinGet\Packages\Gyan.FFmpeg*") do (
-    if exist "%%D\ffmpeg-*\bin\ffmpeg.exe" (
-        for /d %%E in ("%%D\ffmpeg-*") do set "PATH=%%E\bin;%PATH%"
+for /d %%D in ("%LOCALAPPDATA%\Microsoft\WinGet\Packages\Gyan.FFmpeg_*") do (
+    for /d %%E in ("%%D\ffmpeg-*") do (
+        if exist "%%E\bin\ffmpeg.exe" set "PATH=%%E\bin;%PATH%"
     )
 )
 
