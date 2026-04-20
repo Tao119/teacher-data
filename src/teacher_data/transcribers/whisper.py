@@ -33,12 +33,16 @@ async def transcribe_whisper(
                     end_sec=seg.end,
                 ))
 
+        duration = getattr(response, "duration", None)
+        cost = round((duration / 60.0) * 0.006, 6) if duration else 0.0
+
         return TranscriptResult(
             provider="openai",
             model=model,
             text=response.text.strip(),
             language=response.language or language,
             segments=segments,
+            cost_usd=cost,
         )
     except Exception as e:
         return TranscriptResult(

@@ -113,20 +113,22 @@ async def _process_one(
                 cached_g = _CACHE.get(g_key)
 
                 if cached_w:
-                    whisper = TranscriptResult(**cached_w)
+                    whisper = TranscriptResult(**{k: v for k, v in cached_w.items() if k in TranscriptResult.__dataclass_fields__})
                 else:
                     whisper = await transcribe_whisper(chunk_path, settings.openai_api_key, settings.whisper_model, settings.language)
-                    _CACHE.set(w_key, {"provider": whisper.provider, "model": whisper.model, "text": whisper.text, "language": whisper.language, "segments": [], "error": whisper.error})
+                    _CACHE.set(w_key, {"provider": whisper.provider, "model": whisper.model, "text": whisper.text, "language": whisper.language, "segments": [], "error": whisper.error, "cost_usd": whisper.cost_usd})
 
                 if cached_g:
-                    gemini = TranscriptResult(**cached_g)
+                    gemini = TranscriptResult(**{k: v for k, v in cached_g.items() if k in TranscriptResult.__dataclass_fields__})
                 else:
                     gemini = await transcribe_gemini(chunk_path, settings.google_api_key, settings.gemini_model, settings.language)
-                    _CACHE.set(g_key, {"provider": gemini.provider, "model": gemini.model, "text": gemini.text, "language": gemini.language, "segments": [], "error": gemini.error})
+                    _CACHE.set(g_key, {"provider": gemini.provider, "model": gemini.model, "text": gemini.text, "language": gemini.language, "segments": [], "error": gemini.error, "cost_usd": gemini.cost_usd})
 
                 merged = merge(whisper, gemini, settings.similarity_agree_threshold, settings.similarity_review_threshold)
                 if merged.strategy == "both_failed":
                     continue
+
+                cost = round(whisper.cost_usd + gemini.cost_usd, 6)
 
                 from ulid import ULID
                 async with SessionLocal() as db:
@@ -145,6 +147,7 @@ async def _process_one(
                         confidence=round(merged.confidence, 4),
                         cer=round(merged.cer_score, 4),
                         bucket="review" if merged.needs_review else "train",
+                        cost_usd=cost,
                     )
                     db.add(record)
                     await db.commit()

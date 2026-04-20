@@ -18,6 +18,7 @@ class TranscriptResult:
     language: str
     segments: list[TranscriptSegment] = field(default_factory=list)
     error: str | None = None
+    cost_usd: float = 0.0
 
     @property
     def success(self) -> bool:

@@ -67,6 +67,7 @@ class Record(Base):
     confidence = Column(Float, nullable=False)
     cer = Column(Float, nullable=False)
     bucket = Column(String, nullable=False, default="train")
+    cost_usd = Column(Float, nullable=False, default=0.0)
     reviewed_at = Column(DateTime(timezone=True))
     created_at = Column(DateTime(timezone=True), nullable=False, default=now)
     updated_at = Column(DateTime(timezone=True), nullable=False, default=now, onupdate=now)

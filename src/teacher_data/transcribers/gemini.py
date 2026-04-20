@@ -50,11 +50,21 @@ async def transcribe_gemini(
             )
 
             text = response.text.strip() if response.text else ""
+
+            cost = 0.0
+            if hasattr(response, "usage_metadata") and response.usage_metadata:
+                u = response.usage_metadata
+                input_tokens = getattr(u, "prompt_token_count", 0) or 0
+                output_tokens = getattr(u, "candidates_token_count", 0) or 0
+                # gemini-2.5-flash: $0.15/1M input, $0.60/1M output
+                cost = round(input_tokens * 0.15 / 1_000_000 + output_tokens * 0.60 / 1_000_000, 6)
+
             return TranscriptResult(
                 provider="gemini",
                 model=model,
                 text=text,
                 language=language,
+                cost_usd=cost,
             )
         except Exception as e:
             return TranscriptResult(

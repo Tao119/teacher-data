@@ -49,6 +49,8 @@ export default function ReviewPage() {
   const searchParams = useSearchParams();
   const [records, setRecords] = useState<Record[]>([]);
   const [total, setTotal] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
+  const [allCount, setAllCount] = useState(0);
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Record | null>(null);
   const [editText, setEditText] = useState("");
@@ -58,13 +60,22 @@ export default function ReviewPage() {
   );
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  const loadCounts = useCallback(async () => {
+    const [rv, al] = await Promise.all([
+      api.records.list(id, "review", 1),
+      api.records.list(id, undefined, 1),
+    ]);
+    setReviewCount(rv.total);
+    setAllCount(al.total);
+  }, [id]);
+
   const load = useCallback(async () => {
     const res = await api.records.list(id, filter === "review" ? "review" : undefined, page);
     setRecords(res.items);
     setTotal(res.total);
   }, [id, page, filter]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { load(); loadCounts(); }, [load, loadCounts]);
 
   const select = (r: Record) => {
     setSelected(r); setEditText(r.text);
@@ -85,6 +96,7 @@ export default function ReviewPage() {
     if (!selected) return;
     if (editText !== selected.text) await save();
     const updated = await api.records.approve(selected.id);
+    loadCounts();
     const remaining = records.filter(r => r.id !== updated.id);
     if (filter === "review") {
       setRecords(remaining);
@@ -98,6 +110,7 @@ export default function ReviewPage() {
     if (!selected) return;
     if (editText !== selected.text) await save();
     const updated = await api.records.reject(selected.id);
+    loadCounts();
     setRecords(prev => prev.map(r => r.id === updated.id ? updated : r));
     const idx = records.findIndex(r => r.id === selected.id);
     const next = records[idx + 1] ?? records[idx - 1];
@@ -141,7 +154,7 @@ export default function ReviewPage() {
                   background: filter === f ? "var(--accent)" : "transparent",
                   color: filter === f ? "#fff" : "var(--text-secondary)",
                 }}>
-                {f === "review" ? `要レビュー (${total})` : "全件"}
+                {f === "review" ? `要レビュー (${reviewCount})` : `全件 (${allCount})`}
               </button>
             ))}
           </div>

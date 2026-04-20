@@ -26,6 +26,7 @@ class ProjectStats(BaseModel):
     review_count: int
     avg_similarity: float
     total_audio_files: int
+    total_cost_usd: float
 
 
 class ProjectOut(BaseModel):

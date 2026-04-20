@@ -12,6 +12,7 @@ export interface ProjectStats {
   review_count: number;
   avg_similarity: number;
   total_audio_files: number;
+  total_cost_usd: number;
 }
 
 export interface Project {

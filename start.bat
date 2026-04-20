@@ -5,6 +5,10 @@ set ROOT=%~dp0
 REM 末尾のバックスラッシュを除去
 if "%ROOT:~-1%"=="\" set ROOT=%ROOT:~0,-1%
 
+echo Running DB migrations...
+"%ROOT%\.venv\Scripts\python.exe" "%ROOT%\migrate.py"
+echo.
+
 echo Starting FastAPI backend...
 set API_CMD=cd /d "%ROOT%" ^&^& set "PYTHONPATH=%ROOT%\src;%ROOT%\apps\api\src" ^&^& "%ROOT%\.venv\Scripts\uvicorn.exe" teacher_data_api.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir "%ROOT%\src" --reload-dir "%ROOT%\apps\api\src"
 start "Teacher Data API" cmd /k "%API_CMD%"

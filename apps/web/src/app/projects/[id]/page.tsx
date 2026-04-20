@@ -93,12 +93,13 @@ export default function ProjectPage() {
 
       <div className="max-w-5xl mx-auto px-6 py-6 space-y-4">
         {/* Stats row */}
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-5 gap-3">
           {[
-            { label: "音声ファイル", value: stats?.total_audio_files ?? 0, unit: "件", accent: "var(--accent)" },
-            { label: "train", value: stats?.train_count ?? 0, unit: "件", accent: "var(--success)" },
-            { label: "review", value: stats?.review_count ?? 0, unit: "件", accent: "var(--warning)" },
-            { label: "平均類似度", value: stats?.avg_similarity.toFixed(3) ?? "—", unit: "", accent: "var(--text-primary)" },
+            { label: "音声ファイル", value: stats?.total_audio_files ?? 0, unit: "件", accent: "#2563eb" },
+            { label: "train", value: stats?.train_count ?? 0, unit: "件", accent: "#16a34a" },
+            { label: "review", value: stats?.review_count ?? 0, unit: "件", accent: "#d97706" },
+            { label: "平均類似度", value: stats ? `${Math.round(stats.avg_similarity * 100)}%` : "—", unit: "", accent: "#111827" },
+            { label: "推定コスト", value: stats ? `¥${Math.round(stats.total_cost_usd * 150)}` : "—", unit: "", accent: "#6b7280" },
           ].map(s => (
             <div key={s.label} className="rounded-lg border px-4 py-3"
               style={{ background: "var(--surface)", borderColor: "var(--border)" }}>

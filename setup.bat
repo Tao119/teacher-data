@@ -1,29 +1,41 @@
 @echo off
-setlocal
+setlocal EnableDelayedExpansion
 set ROOT=%~dp0
 if "%ROOT:~-1%"=="\" set ROOT=%ROOT:~0,-1%
 
 echo === teacher-data セットアップ ===
 echo.
 
-REM .envがなければ作成
-if not exist "%ROOT%\.env" (
-    copy "%ROOT%\.env.example" "%ROOT%\.env" >nul
-    echo .env を作成しました。
-) else (
-    echo .env は既に存在します。
+REM 既存 .env から APIキーを読み取る
+set EXISTING_OPENAI=
+set EXISTING_GOOGLE=
+if exist "%ROOT%\.env" (
+    for /f "usebackq tokens=1,* delims==" %%A in ("%ROOT%\.env") do (
+        if "%%A"=="OPENAI_API_KEY" set EXISTING_OPENAI=%%B
+        if "%%A"=="GOOGLE_API_KEY" set EXISTING_GOOGLE=%%B
+    )
 )
 
-echo.
+REM 両キーが揃っていればスキップ
+if not "!EXISTING_OPENAI!"=="" if not "!EXISTING_GOOGLE!"=="" (
+    echo .env にAPIキーが設定済みです。スキップします。
+    echo   OPENAI_API_KEY: !EXISTING_OPENAI:~0,8!...
+    echo   GOOGLE_API_KEY: !EXISTING_GOOGLE:~0,8!...
+    goto :install
+)
+
 echo APIキーを入力してください。
 echo.
 
-set /p OPENAI_KEY="OPENAI_API_KEY (sk-...): "
-set /p GOOGLE_KEY="GOOGLE_API_KEY (AIza...): "
+set OPENAI_KEY=!EXISTING_OPENAI!
+set GOOGLE_KEY=!EXISTING_GOOGLE!
+
+if "!OPENAI_KEY!"=="" set /p OPENAI_KEY="OPENAI_API_KEY (sk-...): "
+if "!GOOGLE_KEY!"=="" set /p GOOGLE_KEY="GOOGLE_API_KEY (AIza...): "
 
 (
-echo OPENAI_API_KEY=%OPENAI_KEY%
-echo GOOGLE_API_KEY=%GOOGLE_KEY%
+echo OPENAI_API_KEY=!OPENAI_KEY!
+echo GOOGLE_API_KEY=!GOOGLE_KEY!
 echo LANGUAGE=ja
 echo CONCURRENCY=2
 echo OUTPUT_DIR=output
@@ -33,6 +45,8 @@ echo CACHE_DIR=.cache
 echo.
 echo .env を保存しました。
 echo.
+
+:install
 
 echo Python依存をインストール中...
 cd /d "%ROOT%"
