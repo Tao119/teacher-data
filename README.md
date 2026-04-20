@@ -6,13 +6,19 @@ OpenAI Whisper と Google Gemini の2モデルで音声を文字起こしし、�
 
 ### 1. 依存インストール
 
+**Mac / Linux**
 ```bash
-# Python（uv が必要）
 uv sync
-
-# フロントエンド
 cd apps/web && npm install && cd ../..
 ```
+
+**Windows**
+```bat
+uv sync
+cd apps\web && npm install && cd ..\..
+```
+
+> `uv` がない場合: https://docs.astral.sh/uv/getting-started/installation/
 
 ### 2. 環境変数
 
@@ -28,8 +34,14 @@ GOOGLE_API_KEY=AIza...
 
 ## 起動
 
+**Mac / Linux**
 ```bash
 ./start.sh
+```
+
+**Windows**
+```bat
+start.bat
 ```
 
 - Web UI: http://localhost:3000
