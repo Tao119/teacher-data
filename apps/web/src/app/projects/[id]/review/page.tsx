@@ -2,43 +2,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { api, Record } from "@/lib/api";
-import { CheckCircle2, XCircle, RotateCcw, ChevronLeft, ChevronRight, Save, Database, ChevronLeftIcon } from "lucide-react";
-
-function diffChars(a: string, b: string): { text: string; type: "same" | "add" | "del" }[] {
-  if (a === b) return [{ text: a, type: "same" }];
-  const res: { text: string; type: "same" | "add" | "del" }[] = [];
-  let i = 0;
-  const max = Math.max(a.length, b.length);
-  while (i < max) {
-    if (a[i] === b[i]) {
-      let j = i;
-      while (j < max && a[j] === b[j]) j++;
-      res.push({ text: a.slice(i, j), type: "same" });
-      i = j;
-    } else {
-      let j = i;
-      while (j < max && a[j] !== b[j]) j++;
-      if (i < a.length) res.push({ text: a.slice(i, j), type: "del" });
-      if (i < b.length) res.push({ text: b.slice(i, j), type: "add" });
-      i = j;
-    }
-  }
-  return res;
-}
-
-function DiffText({ base, target }: { base: string; target: string }) {
-  const parts = diffChars(base, target);
-  return (
-    <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ fontFamily: "var(--font-mono, monospace)" }}>
-      {parts.map((p, i) =>
-        p.type === "same" ? <span key={i} style={{ color: "var(--text-primary)" }}>{p.text}</span> :
-        p.type === "add" ? <mark key={i} style={{ background: "#bbf7d0", color: "#15803d", borderRadius: 2 }}>{p.text}</mark> :
-        <del key={i} style={{ background: "#fee2e2", color: "#b91c1c", borderRadius: 2, textDecoration: "line-through" }}>{p.text}</del>
-      )}
-    </p>
-  );
-}
+import { api, Record as ApiRecord } from "@/lib/api";
+import { CheckCircle2, XCircle, RotateCcw, ChevronLeft, ChevronRight, Save, Database } from "lucide-react";
 
 const STRATEGY_COLOR: Record<string, string> = {
   agree: "var(--success)", fallback: "var(--warning)", prefer: "var(--accent)", diverged: "var(--danger)"
@@ -47,12 +12,12 @@ const STRATEGY_COLOR: Record<string, string> = {
 export default function ReviewPage() {
   const { id } = useParams<{ id: string }>();
   const searchParams = useSearchParams();
-  const [records, setRecords] = useState<Record[]>([]);
+  const [records, setRecords] = useState<ApiRecord[]>([]);
   const [total, setTotal] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [allCount, setAllCount] = useState(0);
   const [page, setPage] = useState(1);
-  const [selected, setSelected] = useState<Record | null>(null);
+  const [selected, setSelected] = useState<ApiRecord | null>(null);
   const [editText, setEditText] = useState("");
   const [saving, setSaving] = useState(false);
   const [filter, setFilter] = useState<"review" | "all">(
@@ -77,7 +42,7 @@ export default function ReviewPage() {
 
   useEffect(() => { load(); loadCounts(); }, [load, loadCounts]);
 
-  const select = (r: Record) => {
+  const select = (r: ApiRecord) => {
     setSelected(r); setEditText(r.text);
     if (audioRef.current) audioRef.current.src = api.records.audioUrl(r.id);
   };
@@ -221,41 +186,41 @@ export default function ReviewPage() {
         </aside>
 
         {/* Main panel */}
-        <main className="flex-1 overflow-y-auto p-5" style={{ background: "var(--bg)" }}>
+        <main className="flex-1 overflow-y-auto" style={{ background: "var(--bg)" }}>
           {selected ? (
-            <div className="max-w-2xl mx-auto space-y-4">
-              {/* Audio */}
-              <div className="rounded-lg border" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-                <div className="px-4 py-2.5 border-b flex items-center justify-between"
-                  style={{ borderColor: "var(--border)" }}>
-                  <span className="text-xs font-medium" style={{ color: "var(--text-secondary)" }}>
+            <div className="max-w-2xl mx-auto">
+              {/* Audio — sticky */}
+              <div className="sticky top-0 z-10 border-b px-5 py-3"
+                style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium truncate" style={{ color: "var(--text-secondary)" }}>
                     {selected.audio_file_name}
                   </span>
-                  <span className="text-xs font-mono" style={{ color: "var(--text-muted)" }}>
+                  <span className="text-xs font-mono shrink-0 ml-3" style={{ color: "var(--text-muted)" }}>
                     {selected.start_sec.toFixed(1)}s – {selected.end_sec.toFixed(1)}s
                   </span>
                 </div>
-                <div className="px-4 py-3">
-                  <audio ref={audioRef} controls className="w-full h-8"
-                    src={api.records.audioUrl(selected.id)}
-                    onLoadedMetadata={() => { if (audioRef.current) audioRef.current.currentTime = selected.start_sec; }} />
-                </div>
+                <audio ref={audioRef} controls className="w-full h-8"
+                  src={api.records.audioUrl(selected.id)}
+                  onLoadedMetadata={() => { if (audioRef.current) audioRef.current.currentTime = selected.start_sec; }} />
               </div>
 
-              {/* Diff */}
+              <div className="p-5 space-y-4">
+              {/* Whisper / Gemini 比較 */}
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: "Whisper", base: selected.whisper_text, target: selected.gemini_text, color: "#2563eb" },
-                  { label: "Gemini", base: selected.gemini_text, target: selected.whisper_text, color: "#7c3aed" },
+                  { label: "Whisper", text: selected.whisper_text, color: "#2563eb" },
+                  { label: "Gemini", text: selected.gemini_text, color: "#7c3aed" },
                 ].map(col => (
                   <div key={col.label} className="rounded-lg border"
                     style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-                    <div className="px-3 py-2 border-b"
-                      style={{ borderColor: "var(--border)" }}>
+                    <div className="px-3 py-2 border-b" style={{ borderColor: "var(--border)" }}>
                       <span className="text-xs font-semibold tracking-wide" style={{ color: col.color }}>{col.label}</span>
                     </div>
                     <div className="px-3 py-2.5">
-                      <DiffText base={col.base} target={col.target} />
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: "var(--text-primary)", fontFamily: "monospace" }}>
+                        {col.text}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -325,6 +290,7 @@ export default function ReviewPage() {
                   style={{ color: "var(--accent)", borderColor: "var(--accent)", background: "var(--accent-light)" }}>
                   <Save size={14} /> 保存
                 </button>
+              </div>
               </div>
             </div>
           ) : (
