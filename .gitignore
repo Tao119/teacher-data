@@ -1,0 +1,42 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# App specific
+.env
+.cache/
+output/
+
+# Storage (audio files and DB — machine-local)
+storage/
+
+# Audio files
+*.mp3
+*.wav
+*.m4a
+*.mp4
+*.flac
+*.ogg
+*.webm
+
+# Screenshots
+*.png
+*.jpg
+*.jpeg
+
+# Playwright
+.playwright-mcp/
+
+# Node
+node_modules/
+.next/
+
+# VS Code
+.vscode/
